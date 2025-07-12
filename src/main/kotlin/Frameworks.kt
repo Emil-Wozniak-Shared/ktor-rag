@@ -28,11 +28,8 @@ private fun jedisPool(config: ApplicationConfig) = JedisPool(
 
 private fun DependencyRegistry.system(app: Application) = this.apply {
     val config = app.environment.config
-    val openAiApiKey = config.property("koog.api-key.openai").getString()
-    provide<Logger> { app.log }
     provide<ApplicationConfig> { config }
-    provide<AIApiKey> { AIApiKey(openAi = openAiApiKey) }
-    provide<DatabaseFactory> { DatabaseFactory(resolve(), resolve()) }
+    provide<DatabaseFactory> { DatabaseFactory(resolve()) }
     provide<JedisPool> { jedisPool(config) }
     provide<HttpClient> {
         HttpClient(CIO) {
@@ -45,7 +42,7 @@ private fun DependencyRegistry.system(app: Application) = this.apply {
 
 private fun DependencyRegistry.services() = this.apply {
     provide<AiAgentService> { OpenAiAgentService(resolve(), resolve()) }
-    provide<RedisService> { RedisServiceImpl(resolve(), resolve()) }
+    provide<RedisService> { RedisServiceImpl(resolve()) }
     provide<EmbeddingService> { EmbeddingServiceImpl(resolve()) }
     provide<DocumentService> { DocumentServiceImpl(resolve(), resolve()) }
     provide<RAGService> { RAGServiceImpl(resolve(), resolve()) }

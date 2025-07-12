@@ -36,7 +36,6 @@ class RAGServiceImpl(
                     }
             }
 
-
     private suspend fun generateAnswer(query: String, context: String): Either<AiFailure, String> {
         val keywords = query.lowercase().split(TEXT_REGEX).filter { it.length > 2 }
         val relevantSentences = context.split(CTX_REGEX)

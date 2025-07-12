@@ -11,6 +11,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.server.config.ApplicationConfig
 import kotlinx.serialization.Serializable
 import pl.model.ai.AiFailure
 import pl.model.ai.AiNoResponse
@@ -24,13 +25,14 @@ interface AiAgentService {
 }
 
 internal class OpenAiAgentService(
-    private val aiApikey: AIApiKey,
+    private val config: ApplicationConfig,
     private val client: HttpClient
 ) : AiAgentService {
     private val logger = KotlinLogging.logger {}
 
-    val agent = AIAgent(
-        executor = simpleOpenAIExecutor(aiApikey.openAi),
+    private val apiToken = config.property("koog.api-key.openai").getString()
+    private val agent = AIAgent(
+        executor = simpleOpenAIExecutor(apiToken),
         systemPrompt = "You are a helpful assistant. Answer user questions concisely.",
         llmModel = OpenAIModels.Chat.GPT4o
     )
@@ -51,7 +53,7 @@ internal class OpenAiAgentService(
         try {
             logger.info("Embeddings OpenAI: $text")
             val response = client.post("https://api.openai.com/v1/embeddings") {
-                header(HttpHeaders.Authorization, "Bearer $aiApikey")
+                header(HttpHeaders.Authorization, "Bearer $apiToken")
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(OpenAIEmbeddingRequest(input = text, model = embeddingModel))
             }

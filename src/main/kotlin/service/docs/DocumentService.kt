@@ -54,8 +54,6 @@ class DocumentServiceImpl(
     override suspend fun addDocument(request: DocumentRequest): String {
         logger.info { "Add document: $request" }
         val documentId = UUID.randomUUID().toString()
-        val chunks = chunkText(request.content)
-
         transaction {
             Documents.insert {
                 it[id] = documentId
@@ -64,13 +62,10 @@ class DocumentServiceImpl(
                 it[metadata] = request.metadata
             }
         }
-
-        // Generate embeddings for each chunk
-        chunks.forEachIndexed { index, chunk ->
+        chunkText(request.content).forEachIndexed { index, chunk ->
             val embedding = embeddingService.generateEmbedding(chunk).getOrElse {
                 error(it.message)
             }
-
             transaction {
                 Embeddings.insert {
                     it[id] = UUID.randomUUID().toString()
