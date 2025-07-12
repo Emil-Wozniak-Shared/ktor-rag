@@ -63,14 +63,9 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 }
 
-val profile = project.findProperty("profile") as String? ?: "dev"
-when (profile) {
-    "dev" -> tasks.withType<KotlinCompile> {
-        println("profile: $profile")
-        kotlinOptions {
-            freeCompilerArgs
-        }
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xallow-any-scripts-in-source-roots")
+        jvmTarget = "17"
     }
-
-    else -> {}
 }

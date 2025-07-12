@@ -5,8 +5,8 @@ import io.ktor.server.cio.*
 import pl.config.configureLogback
 
 /**
-* ### For dev config
-* `-config=application-dev.yaml`
+ * ### For dev config
+ * `-config=application-dev.yaml`
  * */
 fun main(args: Array<String>) {
     configureLogback()
@@ -16,7 +16,6 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureFrameworks()
     configureMonitoring()
-    configureSecurity()
     configureRouting()
 }
 

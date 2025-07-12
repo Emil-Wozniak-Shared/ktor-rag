@@ -67,7 +67,9 @@ class DocumentServiceImpl(
 
         // Generate embeddings for each chunk
         chunks.forEachIndexed { index, chunk ->
-            val embedding = embeddingService.generateEmbedding(chunk)
+            val embedding = embeddingService.generateEmbedding(chunk).getOrElse {
+                error(it.message)
+            }
 
             transaction {
                 Embeddings.insert {
@@ -97,15 +99,14 @@ class DocumentServiceImpl(
 
         transaction {
             val embeddings = Embeddings.selectAll().map { row ->
-                Triple(
-                    row[Embeddings.documentId],
-                    row[Embeddings.chunkIndex],
-                    json.decodeFromString<List<Float>>(row[Embeddings.embedding])
-                )
+                EmbeddingWrapper.from(row)
             }
 
             val similarities = embeddings.map { (docId, chunkIdx, embedding) ->
-                val similarity = embeddingService.cosineSimilarity(queryEmbedding, embedding)
+                val similarity = embeddingService.cosineSimilarity(
+                    queryEmbedding,
+                    json.decodeFromString<List<Float>>(embedding)
+                )
                 Triple(docId, chunkIdx, similarity)
             }.sortedByDescending { it.third }
 
@@ -134,19 +135,17 @@ class DocumentServiceImpl(
         return results
     }
 
-    override fun getAllDocuments(): List<Document> {
+    override fun getAllDocuments(): List<Document> = transaction {
         logger.info { "Get all documents" }
-        return transaction {
-            Documents.selectAll()
-                .map { row ->
-                    Document(
-                        id = row[Documents.id],
-                        title = row[Documents.title],
-                        content = row[Documents.content],
-                        metadata = row[Documents.metadata]
-                    )
-                }
-        }
+        Documents.selectAll()
+            .map { row ->
+                Document(
+                    id = row[Documents.id],
+                    title = row[Documents.title],
+                    content = row[Documents.content],
+                    metadata = row[Documents.metadata]
+                )
+            }
     }
 
     private data class EmbeddingWrapper(

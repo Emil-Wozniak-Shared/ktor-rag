@@ -13,7 +13,7 @@ Here are some useful links to get you started:
 To build or run the project, use one of the following tasks:
 
 | Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
+|-------------------------------|----------------------------------------------------------------------|
 | `./gradlew test`              | Run the tests                                                        |
 | `./gradlew build`             | Build everything                                                     |
 | `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
@@ -35,7 +35,7 @@ curl -X POST http://localhost:8080/api/documents \
   -d '{
     "title": "AI Overview",
     "content": "Artificial Intelligence is transforming how we work and live..."
-  }'
+  }' | jq
 ```
 
 Search documents:
@@ -45,7 +45,7 @@ curl -X POST http://localhost:8080/api/search \
   -d '{
     "query": "artificial intelligence",
     "limit": 3
-  }'
+  }' | jq
 ```
 
 Get RAG response:
@@ -54,5 +54,5 @@ curl -X POST http://localhost:8080/api/rag \
   -H "Content-Type: application/json" \
   -d '{
     "query": "What is artificial intelligence?"
-  }'
+  }' | jq
 ```

@@ -1,16 +1,17 @@
 plugins {
+    base
     alias(libs.plugins.kotlin.jvm)
-    java
 }
-
-group = "pl"
-version = "0.0.1"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
+    implementation(kotlin("script-runtime"))
+    implementation(kotlin("scripting-jsr223"))
     implementation(libs.logback.classic)
     implementation(libs.logback.core)
 }

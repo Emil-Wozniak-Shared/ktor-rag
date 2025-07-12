@@ -39,7 +39,9 @@ fun Application.configureRouting() {
         }
     }
     install(Resources)
-    install(ContentNegotiation) { json() }
+    install(ContentNegotiation) {
+        json()
+    }
 
     val openAiAgentService: AiAgentService by dependencies
     val documentService: DocumentService by dependencies
