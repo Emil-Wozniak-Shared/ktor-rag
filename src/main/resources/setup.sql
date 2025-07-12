@@ -1,0 +1,3 @@
+CREATE DATABASE rag_db;
+CREATE USER postgres WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE rag_db TO postgres;
