@@ -47,8 +47,8 @@ private fun DependencyRegistry.services() = this.apply {
     provide<AiAgentService> { OpenAiAgentService(resolve(), resolve()) }
     provide<RedisService> { RedisServiceImpl(resolve(), resolve()) }
     provide<EmbeddingService> { EmbeddingServiceImpl(resolve()) }
-    provide<DocumentService> { DocumentServiceImpl(resolve(), resolve(), resolve()) }
-    provide<RAGService> { RAGServiceImpl(resolve(), resolve(), resolve()) }
+    provide<DocumentService> { DocumentServiceImpl(resolve(), resolve()) }
+    provide<RAGService> { RAGServiceImpl(resolve(), resolve()) }
 }
 
 fun Application.configureFrameworks() {

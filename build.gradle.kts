@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
     alias(libs.plugins.kotlin.plugin.serialization)
-    groovy
 }
 
 group = "pl"
@@ -38,12 +37,15 @@ dependencies {
     implementation(libs.ktor.server.double.receive)
     implementation(libs.ktor.line.webhook.plugin)
     implementation(libs.ktor.server.cio)
-    val logbackVersion = "1.4.14"
-    // Logback with Groovy support
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("ch.qos.logback:logback-core:$logbackVersion")
+
+    implementation("org.codehaus.groovy:groovy-all:3.0.13")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+
+    implementation(libs.logback.classic)
+    implementation(libs.logback.core)
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
+
     // Database
-    implementation("org.postgresql:postgresql:42.7.0")
     implementation("org.jetbrains.exposed:exposed-core:0.44.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.44.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.1")
@@ -52,19 +54,13 @@ dependencies {
     // Redis
     implementation("redis.clients:jedis:5.0.2")
     implementation("org.apache.commons:commons-math3:3.6.1")
-
-    // Optional: Structured logging
-    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
     implementation(libs.arrow.core)
     implementation(libs.arrow.fx.coroutines)
     implementation(libs.koog.agents)
     implementation(libs.ktor.server.config.yaml)
+    implementation(project(":logbackt"))
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
-    configurations.all {
-        exclude(group = "commons-logging", module = "commons-logging")
-        exclude(group = "org.slf4j", module = "slf4j-log4j12")
-    }
 }
 
 val profile = project.findProperty("profile") as String? ?: "dev"

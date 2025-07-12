@@ -3,7 +3,7 @@ package pl.service.ai
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
-import io.ktor.util.logging.Logger
+import io.github.oshai.kotlinlogging.KotlinLogging
 import pl.model.ai.AiFailure
 import pl.model.ai.RAGResponse
 import pl.service.docs.DocumentService
@@ -19,17 +19,21 @@ private val WHITESPACE = "\\s+".toRegex()
 class RAGServiceImpl(
     private val documentService: DocumentService,
     private val aiAgentService: AiAgentService,
-    private val logger: Logger
 ) : RAGService {
+    private val logger = KotlinLogging.logger {}
+
     override suspend fun generateAnswer(query: String): RAGResponse =
-        documentService.searchDocuments(query, 3)
-            .let { searchResults ->
-                RAGResponse(
-                    query = query,
-                    answer = generateAnswer(query, context = searchResults.joinToString("\n\n") { it.content })
-                        .getOrElse { it.message },
-                    sources = searchResults
-                )
+        logger.info { "Generate answer: $query" }
+            .run {
+                documentService.searchDocuments(query, 3)
+                    .let { searchResults ->
+                        RAGResponse(
+                            query = query,
+                            answer = generateAnswer(query, context = searchResults.joinToString("\n\n") { it.content })
+                                .getOrElse { it.message },
+                            sources = searchResults
+                        )
+                    }
             }
 
 

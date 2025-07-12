@@ -1,16 +1,12 @@
 package pl.service.docs
 
-import arrow.core.Either
 import arrow.core.getOrElse
-import io.ktor.util.logging.*
-import kotlinx.coroutines.runBlocking
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.config.Documents
 import pl.config.Embeddings
-import pl.model.ai.AiFailure
 import pl.model.redis.Document
 import pl.model.redis.DocumentRequest
 import pl.model.redis.SearchResult
@@ -51,11 +47,12 @@ interface DocumentService {
 class DocumentServiceImpl(
     private val embeddingService: EmbeddingService,
     private val redisService: RedisService,
-    private val logger: Logger
 ) : DocumentService {
     private val json = Json { ignoreUnknownKeys = true }
+    private val logger = KotlinLogging.logger {}
 
     override suspend fun addDocument(request: DocumentRequest): String {
+        logger.info { "Add document: $request" }
         val documentId = UUID.randomUUID().toString()
         val chunks = chunkText(request.content)
 
@@ -87,8 +84,13 @@ class DocumentServiceImpl(
     }
 
     override suspend fun searchDocuments(query: String, limit: Int): List<SearchResult> {
-        // Check cache first
-        redisService.getCachedSearchResults(query).takeIf { it.isNotEmpty() }?.let { return it }
+        logger.info { "Search for documents" }
+        redisService.getCachedSearchResults(query)
+            .takeIf { it.isNotEmpty() }
+            ?.let {
+                logger.info { "Found documents in cache ${it.size}" }
+                return it
+            }
 
         val queryEmbedding = embeddingService.generateEmbedding(query).getOrElse { listOf() }
         val results = mutableListOf<SearchResult>()
@@ -127,21 +129,23 @@ class DocumentServiceImpl(
             }
         }
 
-        // Cache results
+        logger.info { "Add documents to cache ${results.size}" }
         redisService.cacheSearchResults(query, results)
         return results
     }
 
     override fun getAllDocuments(): List<Document> {
+        logger.info { "Get all documents" }
         return transaction {
-            Documents.selectAll().map { row ->
-                Document(
-                    id = row[Documents.id],
-                    title = row[Documents.title],
-                    content = row[Documents.content],
-                    metadata = row[Documents.metadata]
-                )
-            }
+            Documents.selectAll()
+                .map { row ->
+                    Document(
+                        id = row[Documents.id],
+                        title = row[Documents.title],
+                        content = row[Documents.content],
+                        metadata = row[Documents.metadata]
+                    )
+                }
         }
     }
 

@@ -6,6 +6,7 @@ import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -26,6 +27,8 @@ internal class OpenAiAgentService(
     private val aiApikey: AIApiKey,
     private val client: HttpClient
 ) : AiAgentService {
+    private val logger = KotlinLogging.logger {}
+
     val agent = AIAgent(
         executor = simpleOpenAIExecutor(aiApikey.openAi),
         systemPrompt = "You are a helpful assistant. Answer user questions concisely.",
@@ -33,8 +36,10 @@ internal class OpenAiAgentService(
     )
 
     override suspend fun ask(input: String): Either<AiFailure, String> = either {
+        logger.info { "Ask OpenAI: $input" }
         val result = agent.runAndGetResult(input)
         ensure(result != null) {
+            logger.error { "No response from OpenAI" }
             raise(AiNoResponse)
         }
         result
@@ -44,6 +49,7 @@ internal class OpenAiAgentService(
 
     override suspend fun embeddings(text: String): Either<AiFailure, List<Float>> = either {
         try {
+            logger.info("Embeddings OpenAI: $text")
             val response = client.post("https://api.openai.com/v1/embeddings") {
                 header(HttpHeaders.Authorization, "Bearer $aiApikey")
                 header(HttpHeaders.ContentType, "application/json")
@@ -52,15 +58,18 @@ internal class OpenAiAgentService(
             if (response.status == HttpStatusCode.OK) {
                 val embedding = response.body<OpenAIEmbeddingResponse>().data.firstOrNull()?.embedding
                 ensure(embedding != null) {
+                    logger.error { "OpenAI: ${"No embedding data received"}" }
                     raise(NoEmbeddingReceivedResponse)
                 }
+                logger.info { "Embedding response: $embedding" }
                 embedding
             } else {
                 val errorBody = response.body<String>()
+                logger.error { "OpenAI: $errorBody" }
                 raise(OpenAIAPIErrorResponse(response.status.description, errorBody))
             }
         } catch (e: Exception) {
-            println("Error generating embedding: ${e.message}")
+            logger.error { "Error generating embedding: ${e.message}" }
             createMockEmbedding(text)
         }
     }
