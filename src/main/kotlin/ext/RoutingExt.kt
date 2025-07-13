@@ -24,6 +24,6 @@ suspend inline fun <reified E, reified T> Either<E, T>.send(
     call: RoutingCall,
     status: HttpStatusCode = OK,
 ) where T : DtoResponse, E : FailureResponse {
-    onLeft { call.respond(it.status, it) }
+    onLeft { call.respond(it.status(), it) }
     onRight { call.respond(status, it) }
 }

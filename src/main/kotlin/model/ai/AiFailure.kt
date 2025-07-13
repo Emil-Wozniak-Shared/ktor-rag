@@ -7,14 +7,12 @@ interface AiFailure: Failure
 
 @Serializable
 object AiNoResponse: AiFailure {
-    override val message: String
-        get() = "AI failed: no response"
+    override val message: String = "AI failed: no response"
 }
 
 @Serializable
 object NoEmbeddingReceivedResponse: AiFailure {
-    override val message: String
-        get() = "No embedding data received"
+    override val message: String = "No embedding data received"
 }
 
 @Serializable
@@ -22,7 +20,6 @@ class OpenAIAPIErrorResponse(
     val status: String,
     val errorBody: String
 ): AiFailure {
-    override val message: String
-        get() = "OpenAI API error status: $status - $errorBody"
+    override val message: String = "OpenAI API error status: $status - $errorBody"
 }
 

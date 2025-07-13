@@ -22,19 +22,18 @@ class RAGServiceImpl(
 ) : RAGService {
     private val logger = KotlinLogging.logger {}
 
-    override suspend fun generateAnswer(query: String): RAGResponse =
+    override suspend fun generateAnswer(query: String): RAGResponse = run {
         logger.info { "Generate answer: $query" }
-            .run {
-                documentService.searchDocuments(query, 3)
-                    .let { searchResults ->
-                        RAGResponse(
-                            query = query,
-                            answer = generateAnswer(query, context = searchResults.joinToString("\n\n") { it.content })
-                                .getOrElse { it.message },
-                            sources = searchResults
-                        )
-                    }
+        documentService.searchDocuments(query, 3)
+            .let { searchResults ->
+                RAGResponse(
+                    query = query,
+                    answer = generateAnswer(query, context = searchResults.joinToString("\n\n") { it.content })
+                        .getOrElse { it.message },
+                    sources = searchResults
+                )
             }
+    }
 
     private suspend fun generateAnswer(query: String, context: String): Either<AiFailure, String> {
         val keywords = query.lowercase().split(TEXT_REGEX).filter { it.length > 2 }

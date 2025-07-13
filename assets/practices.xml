@@ -1,0 +1,254 @@
+<page xmlns="http://www.xwiki.org">
+    <link rel="http://www.xwiki.org/rel/space" href="http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main"/>
+    <version>1.1</version>
+    <majorVersion>1</majorVersion>
+    <minorVersion>1</minorVersion>
+    <created>2009-03-21+01:00</created>
+    <creator>XWiki.Admin</creator>
+    <modified>2009-03-21+01:00</modified>
+    <modifier>XWiki.Admin</modifier>
+    <title>Kotlin best practises</title>
+    <content>
+        === Kotlin best practises ===
+        Foreword
+
+        The purpose of this document is twofold: it has been created to act both as a guide for new developers, especially ones without previous Kotlin experience, on the most important Kotlin specific practises and tools from the perspective of the team and to act as a living document of the various architecture and coding style decisions that the team has made during service development.
+
+        Each service will still have their own architecture decision log, but here we will list any non service specific decisions, style guides and general tips that anyone working on our code base should be aware of.
+
+        While this document mainly exists for the Wallet team’s internal usage and therefore only covers things relevant to our particular needs it should also provide a starting point for any other team that wishes to develop with Kotlin, particularly on the backend.
+        What is Kotlin and why we use it
+
+        https://en.wikipedia.org/wiki/Kotlin_(programming_language)
+
+        https://kotlinlang.org/
+
+        In short Kotlin is "yet another functional JVM language". The main benefits compared to developing with Java are similar to other functional languages.
+
+        Less boilerplate code
+        More concise syntax
+        Removing(/hiding) internal inconsistencies that Java has accumulated
+        Maintain Java interoperability
+
+        There are however some things Kotlin brings to the table that are not shared by all similar languages.
+
+        Strict typing + Type inference
+        Kotlin is a strictly typed language
+        Type inference greatly reduces the boiler plate normally associated with that
+        Null safety
+        Variables have to be explicitly declared as nullable
+        Safecall handling for nullable values enforced by IDE
+
+        Learning Kotlin
+
+        This document doesn’t go through all the basics. https://kotlinlang.org/docs/reference/ has all the up to date resources to get you started. The team library also includes Kotlin in Action which is a slightly heavier read but the first few chapters do a really good job of introducing the major differences between Kotlin and Java.
+        Best practises
+        Principles
+        Keep it Readable
+
+        "Indeed, the ratio of time spent reading versus writing is well over 10 to 1. We are constantly reading old code as part of the effort to write new code. …[Therefore,] making it easy to read makes it easier to write." - Martin C. Fowler, Clean Code
+
+        The easier the code is to understand the easier it to see the actual logic and if necessary fix it
+        Use your judgement
+        Readability for a particular task is generally more valuable than following convention, but convention makes things more readable. Try to maintain a balance of only breaking convention when there is a clear readability improvement
+        Concise does not always equate readable
+        Your function chain with multiple elvis operations that can be extended by passing it a lambda might be really cool and clever, but would it be easier to understand if you just wrote it out in plain old Java style?
+        New developers will most likely know Java better than Kotlin, so consider this when writing code.
+        If you’re doing something Kotlin specific that isn’t covered here, consider how easy it to understand and if necessary add a comment into your code or a section to this document
+
+        Keep it Safe
+
+        Take full advantage of the added safety features: immutability and null safety
+
+        Coding conventions
+
+        We follow the Kotlin official conventions unless specifically overruled by this document
+        https://kotlinlang.org/docs/reference/coding-conventions.html
+        Several points from the above reference are also listed in this document to highlight them
+        It is important to follow the general coding conventions for most things as this makes it easier for new developers to understand our code, but there are times when your particular problem can be solved in a non standard way that is actually more readable in that particular case.
+
+        Safe variable declarations
+
+        Always use a non-nullable type whenever possible
+        Always declare variables as val unless you have a specific reason to use var
+        Also use immutable collections instead of mutable ones
+        If you need to declare a variable before assigning it a value instead of nullable declare it as lateinit
+        If you find yourself doing this check if you should instead refactor your code to a lambda declaration to initialize the value instead
+        e.g. val x = { when thumb_up { … } }
+        Use safe calls and elvis operator with nullable variables
+        https://kotlinlang.org/docs/reference/null-safety.html#safe-calls
+        https://kotlinlang.org/docs/reference/null-safety.html#elvis-operator
+        Do not use !! to force null pointer exceptions
+
+        Use when
+
+        https://kotlinlang.org/docs/reference/control-flow.html#when-expression
+
+        In Java you mainly used the switch statement together with enums. In Kotlin switch has been replaced by when which can and should be used for a far wider array of flow management.
+
+        If you have a code block that has more than one if-statement you should almost always refactor it into a when.
+        If you have an if structure with only boolean checks sometimes it can be more readable with the if structures, so use common sense
+
+        Classes and functions
+        Declaring multiple classes in one file
+
+        Consider defining strongly linked classes in the same file
+        Data classes that are only used as return values and the class using them
+        Collections of data classes and enums used throughout a package
+        Such a collection file should named so that it is easily recognized and linkable to the package
+        g. PackageNameDomainObjects.kt
+        Take the file size into account, even though some classes have very strong interconnections you might still want to declare them in their own files to avoid having a massive monolith file you have to scroll through.
+
+        Constructors
+
+        Try to only define a primary constructor and, if necessary, an init block
+        Instead of overloading the constructor as secondary constructors provide default arguments
+        https://kotlinlang.org/docs/reference/functions.html#default-arguments
+        Defining builders is supported but not recommended as you should be able to achieve the same effect with default arguments and it is best to stick to one way of doing things
+        Not possibly relevant for us but if you need to create your Kotlin object with default arguments from a Java class you will likely need to use the @JavaOverloads annotation
+        And on the calling side you should use named arguments whenever you are not passing all the possible arguments
+        https://kotlinlang.org/docs/reference/functions.html#named-arguments
+
+        Parameter and state validation
+
+        If you need to validate parameter values you should do so explicitly using a require block
+        Require works similarly to an if statement that that throws an IllegalParameterException if the result is false
+        https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/require.html
+        Can be used in the constructor, init blocks or any function where you need to check parameter values
+        Correspondly state validation should use similar check block
+        https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/check.html
+        Throws IllegalStateException
+
+        Properties and data classes
+
+        https://kotlinlang.org/docs/reference/properties.html
+
+        Declare class variables as public and use property access instead of setters and getters
+        Variables declared as var can get both get and set externally and val is read only.
+        You can still define an explicit setter or getter for a variable id you need to, for example, do some computation on the value and still use the property access syntax on the calling side
+
+        https://kotlinlang.org/docs/reference/data-classes.html
+
+        Data classes should be used extensively and declared with the keyword data
+        Declaring a class as a data class reduces significant amount of boilerplate
+        All parameters from the primary constructor will be declared as properties
+        equals(), hashcode(), copy(), toString() (and componentN() (for destructuring)) functions will be generated
+        E.g. data class User(val name: String, var age: Int) is a complete data class implementation
+        Data classes come with a build in copy function that can be used to create a copy with value changes
+        https://kotlinlang.org/docs/reference/data-classes.html#copying
+
+        Since many data classes are only ever created by one class in the project it in those cases makes sense to declare data classes in the same file as the creating class
+        Scope Functions
+
+        Koltin provides five scope functions, let, run, with, apply, and also, that all exist to execute a block of code on an object. See the link below to learn how they are used:
+        https://kotlinlang.org/docs/reference/scope-functions.html
+
+        Companion objects
+
+        https://kotlinlang.org/docs/reference/object-declarations.html#companion-objects
+
+        Replaces static variables and functions
+        The place to define a factory and any serialization functions related to a data class etc.
+        If you need a static helper function that is only ever used when dealing with this one particular class that should also be declared in the companion object
+
+        Return values
+
+        Avoid returning null (especially on public functions)
+        Null should never be used to denote an error state
+        Instead throw an exception
+        Or consider using a sealed class (see below)
+        When successful execution sometimes yields no results
+        If the return object is a collection simply return an empty collection
+        On a case-by-case basis you need to decide when it makes more sense to return a nullable or simply throw an exception anyway or defining a sealed class (see below)
+        This can be difficult to determine when first writing a class
+        It mainly comes down to usage
+        If not returning anything is a common occurrence where no action is, other than filtering the result or similar, is required nullable might make more sense
+        If returning nothing is exceptionally rare or you usually need to do some handling when it happens (log, stop execution, trigger a different function, etc) then throwing an exception is probably a better idea
+        Also see the note about sealed classes below as an option, especially if returning a data class that represents the result of an external query
+        Protect your mutables from other objects making changes to them accidentally
+        When returning a mutable collection you should upcast it to a non-mutable version
+        e. return mutableList as List
+        Similarly you should attempt to protect your other class variables by only returning immutable ones or copies of the data instead of the original.
+        Use Pair and Triple as return values sparingly
+        Sometimes you will find yourself wanting to return a few values and for that Pair and Triple are the simplest solution
+        However a better, if slightly more verbose, tactic is to declare a return object data class that contains those values. This makes the handling more explicit and easier to read.
+        As a quick rule of thumb internal functions can use Pairs and Triples since the creation and handling will always be in the same class, but public functions should instead return data classes
+        You will notice that many Kotlin libraries do in fact use Pairs and Triples as the public return values, but you will also notice that to use them you will pretty much always have to go to the source code to figure out what is actually returned and in what order.
+
+        Returning sealed classes
+
+        https://kotlinlang.org/docs/reference/sealed-classes.html
+
+        https://phauer.com/2019/sealed-classes-exceptions-kotlin/
+
+        The above blog post describes a nice looking way of using sealed classes to return success and error states. Consider using it over simply throwing an exception.
+
+        Chaining collection functions
+
+        Unlike Java Stream API you do not have to explicitly declare that you want to change a collection to a stream and finally explicitly collect the result afterwards.
+        This means, again, less boilerplate for simple streaming operations like mapping and filtering
+        Also means each function is implicitly collected and when chaining functions each item in the collection must go through the function before we run the next function on them
+        This can lead it being slower than Java stream operations which process item at a time rather than chained function at a time
+        For this reason Kotlin introduces sequences which work exactly like Java streams
+        Whenever you are chaining multiple functions on a collection with more than trivial number of items, the best practise is to declare it as a sequence
+        https://blog.kotlin-academy.com/effective-kotlin-use-sequence-for-bigger-collections-with-more-than-one-processing-step-649a15bb4bf
+        Kotlin sequences are not parallel and for massive data sets you can be better off using Java parallel streams
+
+        Nested lambdas
+
+        When nesting lambdas take particular care to retain readability and you should avoid using the ‘it’ default parameter name, as it can get hard too see which lambda level it refers to
+
+        Top level functions
+
+        Top level functions replace utility classes
+        They are not declared inside a class, instead they can theoretically be declared in any file inside a package
+        But best practise is to have a [Package/Domain/Etc]Utils.kt file in the package and declare all the top level functions in there
+        If your utility function is only used by one class or only needed when dealing with a particular class it should probably not be declared as a top level function, but instead it should be declared inside that class (see also Companion objects above)
+
+        Closeables
+
+        Some resources (streams, clients etc.) implement the Closeable interface and after using it you need to explicitly call close() to tell the jvm that you no longer require that resource and it can be garbage collected.
+        Kotlin provides a use block that ensures that the resource is properly closed afterwards despite any error conditions or the like
+        https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io/use.html
+
+        Java libraries
+
+        Extensions can be used to modify external library behaviour either to provide a more Kotlin like experience or to add a layer of domain specific logic
+        https://kotlinlang.org/docs/reference/extensions.html
+        Keep in mind that Kotlin can not tell whether a Java method can return null (unless it has been correctly annotated) instead it returns a Platform Type
+        https://kotlinlang.org/docs/reference/java-interop.html
+        Best practice is to assume that any return values from calls to Java code are always nullable , that way the IDE will force you to use safe calls
+        g. If you call a Java method that declares a return type of String explicitly declare a variable created from that as String?
+        val fromJava: String? = JavaObject.method()
+        Libraries may change, even if you know a Java library can never, under any circumstances, return null, if it isn’t annotated you can not trust that it won’t change without you noticing
+
+        Style
+        Tools and libraries
+        Logging
+
+        We use a lazy logging library called kotlin-logging
+        https://github.com/MicroUtils/kotlin-logging
+        You can create the logger variable outside of you actual class as a top level declaration
+        https://github.com/MicroUtils/kotlin-logging#usage suggest setting up an Idea live template to speed up the logger variable creation
+        You can also have your class extend Kloggin, but that leads to having multiple ways of declaring the logger based on what your companion object looks like, so while cleaner looking it is not recommended
+
+        Tips
+        Strings
+
+        Familiarise yourself with Kotlin String template
+        https://kotlinlang.org/docs/reference/basic-types.html#string-templates
+        Triple quoted Strings, i.e. ”"”some string”"”, are treated as literal and retain all formatting characters and require no escape characters
+
+        Operator overloading
+
+        In Kotlin operators such as +, - and * are linked linked to corresponding functions and by providing those functions in your classes you can create some powerfully concise handling syntax in a DSL
+        https://kotlinlang.org/docs/reference/operator-overloading.html
+        https://kotlinlang.org/docs/reference/type-safe-builders.html
+        Do not abuse this functionality, + sign already means something and regular code so using it for something else is misleading. Only do this inside your specific DSL!
+
+        Equality
+
+        The == operator in Kotlin is actually also overloaded (see above) and calls .equals(). If you need to check for reference equality the operator is ===
+
+    </content>
+</page>

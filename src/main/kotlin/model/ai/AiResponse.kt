@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import pl.model.DtoResponse
 import pl.model.error.Failure
 import pl.model.error.FailureResponse
-import pl.model.redis.SearchResult
 
 @Serializable
 class AskAiResponse(val message: String) : DtoResponse
@@ -17,7 +16,7 @@ interface AiFailureResponse : FailureResponse {
 val aiFailureMapper: (Failure) -> AiFailureResponse = {
     object : AiFailureResponse {
         override val message: String = it.message
-        override val status: HttpStatusCode = HttpStatusCode.InternalServerError
+        override fun status(): HttpStatusCode = HttpStatusCode.InternalServerError
     }
 }
 

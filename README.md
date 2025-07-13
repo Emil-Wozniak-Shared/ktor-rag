@@ -1,14 +1,18 @@
- ejdev
+# Application EJ Dev!
+This project shows how to use AI RAG in your work environment.
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
-
-Here are some useful links to get you started:
-
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+- this example includes XWiki (Confluence like app) to obtain your work documentations.
 
 ## Building & Running
+
+Fill [application.yaml](src/main/resources/application.yaml)
+
+The application requires several additional application which you can start using docker.
+
+```bash
+cd ./docker
+docker compose up
+```
 
 To build or run the project, use one of the following tasks:
 
@@ -22,13 +26,15 @@ To build or run the project, use one of the following tasks:
 | `run`                         | Run the server                                                       |
 | `runDocker`                   | Run using the local docker image                                     |
 
-If the server starts successfully, you'll see the following output:
+### XWiki
+Open `localhost:9090` and add you pages or you can upload samples
+```bash
+bash ./assets/xwiki-upload.sh
+```
 
-```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
-```
-Add a document:
+## How to use it
+
+### Add a document:
 ```bash
 curl -X POST http://localhost:8080/api/documents \
   -H "Content-Type: application/json" \
@@ -38,21 +44,32 @@ curl -X POST http://localhost:8080/api/documents \
   }' | jq
 ```
 
-Search documents:
+### Load documents from xwiki:
+```bash
+curl -X POST http://localhost:8080/api/documents/xwiki
+```
+
+### Search documents:
 ```bash
 curl -X POST http://localhost:8080/api/search \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "artificial intelligence",
-    "limit": 3
+    "query": "Security/Privacy Implications",
+    "limit": 5
   }' | jq
 ```
 
-Get RAG response:
+### Get all documents:
+```bash
+curl http://localhost:8080/api/documents | jq
+```
+
+### Get RAG response:
 ```bash
 curl -X POST http://localhost:8080/api/rag \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "What is artificial intelligence?"
+    "query": "What is the best practices to create good architecture?",
+    "limit": 10
   }' | jq
 ```

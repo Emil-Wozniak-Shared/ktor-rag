@@ -1,0 +1,173 @@
+{
+  "links": [],
+  "spaces": [
+    {
+      "links": [
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/pages",
+          "rel": "http://www.xwiki.org/rel/pages",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/pages/WebHome",
+          "rel": "http://www.xwiki.org/rel/home",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/search",
+          "rel": "http://www.xwiki.org/rel/search",
+          "type": null,
+          "hrefLang": null
+        }
+      ],
+      "id": "xwiki:Main",
+      "wiki": "xwiki",
+      "name": "Main",
+      "home": "xwiki:Main.WebHome",
+      "xwikiRelativeUrl": "http://localhost:9090/bin/view/Main/",
+      "xwikiAbsoluteUrl": "http://localhost:9090/bin/view/Main/"
+    },
+    {
+      "links": [
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/spaces/%20Kotlin%20best%20practises/pages",
+          "rel": "http://www.xwiki.org/rel/pages",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/spaces/%20Kotlin%20best%20practises/pages/WebHome",
+          "rel": "http://www.xwiki.org/rel/home",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/spaces/%20Kotlin%20best%20practises/search",
+          "rel": "http://www.xwiki.org/rel/search",
+          "type": null,
+          "hrefLang": null
+        }
+      ],
+      "id": "xwiki:Main. Kotlin best practises",
+      "wiki": "xwiki",
+      "name": " Kotlin best practises",
+      "home": "xwiki:Main. Kotlin best practises.WebHome",
+      "xwikiRelativeUrl": "http://localhost:9090/bin/view/Main/%20Kotlin%20best%20practises/",
+      "xwikiAbsoluteUrl": "http://localhost:9090/bin/view/Main/%20Kotlin%20best%20practises/"
+    },
+    {
+      "links": [
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/spaces/Kotlin%20best%20practises/pages",
+          "rel": "http://www.xwiki.org/rel/pages",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/spaces/Kotlin%20best%20practises/pages/WebHome",
+          "rel": "http://www.xwiki.org/rel/home",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/Main/spaces/Kotlin%20best%20practises/search",
+          "rel": "http://www.xwiki.org/rel/search",
+          "type": null,
+          "hrefLang": null
+        }
+      ],
+      "id": "xwiki:Main.Kotlin best practises",
+      "wiki": "xwiki",
+      "name": "Kotlin best practises",
+      "home": "xwiki:Main.Kotlin best practises.WebHome",
+      "xwikiRelativeUrl": "http://localhost:9090/bin/view/Main/Kotlin%20best%20practises/",
+      "xwikiAbsoluteUrl": "http://localhost:9090/bin/view/Main/Kotlin%20best%20practises/"
+    },
+    {
+      "links": [
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/XWiki/pages",
+          "rel": "http://www.xwiki.org/rel/pages",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/XWiki/pages/WebHome",
+          "rel": "http://www.xwiki.org/rel/home",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/XWiki/search",
+          "rel": "http://www.xwiki.org/rel/search",
+          "type": null,
+          "hrefLang": null
+        }
+      ],
+      "id": "xwiki:XWiki",
+      "wiki": "xwiki",
+      "name": "XWiki",
+      "home": "xwiki:XWiki.WebHome",
+      "xwikiRelativeUrl": "http://localhost:9090/bin/view/XWiki/",
+      "xwikiAbsoluteUrl": "http://localhost:9090/bin/view/XWiki/"
+    },
+    {
+      "links": [
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/xwiki/pages",
+          "rel": "http://www.xwiki.org/rel/pages",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/xwiki/pages/WebHome",
+          "rel": "http://www.xwiki.org/rel/home",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/xwiki/search",
+          "rel": "http://www.xwiki.org/rel/search",
+          "type": null,
+          "hrefLang": null
+        }
+      ],
+      "id": "xwiki:xwiki",
+      "wiki": "xwiki",
+      "name": "xwiki",
+      "home": "xwiki:xwiki.WebHome",
+      "xwikiRelativeUrl": "http://localhost:9090/bin/view/xwiki/",
+      "xwikiAbsoluteUrl": "http://localhost:9090/bin/view/xwiki/"
+    },
+    {
+      "links": [
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/xwiki/spaces/%20tutor/pages",
+          "rel": "http://www.xwiki.org/rel/pages",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/xwiki/spaces/%20tutor/pages/WebHome",
+          "rel": "http://www.xwiki.org/rel/home",
+          "type": null,
+          "hrefLang": null
+        },
+        {
+          "href": "http://localhost:9090/rest/wikis/xwiki/spaces/xwiki/spaces/%20tutor/search",
+          "rel": "http://www.xwiki.org/rel/search",
+          "type": null,
+          "hrefLang": null
+        }
+      ],
+      "id": "xwiki:xwiki. tutor",
+      "wiki": "xwiki",
+      "name": " tutor",
+      "home": "xwiki:xwiki. tutor.WebHome",
+      "xwikiRelativeUrl": "http://localhost:9090/bin/view/xwiki/%20tutor/",
+      "xwikiAbsoluteUrl": "http://localhost:9090/bin/view/xwiki/%20tutor/"
+    }
+  ]
+}

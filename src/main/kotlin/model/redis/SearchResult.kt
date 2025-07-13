@@ -21,7 +21,7 @@ data class DocumentRequest(
 @Serializable
 data class SearchRequest(
     val query: String,
-    val limit: Int = 5
+    val limit: Int
 )
 
 @Serializable

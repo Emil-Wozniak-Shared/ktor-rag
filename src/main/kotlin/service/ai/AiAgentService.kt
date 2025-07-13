@@ -24,6 +24,8 @@ interface AiAgentService {
     suspend fun embeddings(text: String): Either<AiFailure, List<Float>>
 }
 
+private val WORD_REGEX = "\\W+".toRegex()
+
 internal class OpenAiAgentService(
     private val config: ApplicationConfig,
     private val client: HttpClient
@@ -31,6 +33,8 @@ internal class OpenAiAgentService(
     private val logger = KotlinLogging.logger {}
 
     private val apiToken = config.property("koog.api-key.openai").getString()
+    private val embeddingModel = "text-embedding-3-small"
+
     private val agent = AIAgent(
         executor = simpleOpenAIExecutor(apiToken),
         systemPrompt = "You are a helpful assistant. Answer user questions concisely.",
@@ -47,11 +51,9 @@ internal class OpenAiAgentService(
         result
     }
 
-    private val embeddingModel = "text-embedding-3-small"
-
     override suspend fun embeddings(text: String): Either<AiFailure, List<Float>> = either {
         try {
-            logger.info("Embeddings OpenAI: $text")
+            logger.info { "Embeddings OpenAI: $text" }
             val response = client.post("https://api.openai.com/v1/embeddings") {
                 header(HttpHeaders.Authorization, "Bearer $apiToken")
                 header(HttpHeaders.ContentType, "application/json")
@@ -60,7 +62,7 @@ internal class OpenAiAgentService(
             if (response.status == HttpStatusCode.OK) {
                 val embedding = response.body<OpenAIEmbeddingResponse>().data.firstOrNull()?.embedding
                 ensure(embedding != null) {
-                    logger.error { "OpenAI: ${"No embedding data received"}" }
+                    logger.error { "OpenAI: No embedding data received" }
                     raise(NoEmbeddingReceivedResponse)
                 }
                 logger.info { "Embedding response: $embedding" }
@@ -77,7 +79,7 @@ internal class OpenAiAgentService(
     }
 
     private fun createMockEmbedding(text: String, dimensions: Int = 1536): List<Float> {
-        val words = text.lowercase().split(Regex("\\W+")).filter { it.isNotEmpty() }
+        val words = text.lowercase().split(WORD_REGEX).filter { it.isNotEmpty() }
         val embedding = FloatArray(dimensions) { 0f }
 
         words.forEachIndexed { index, word ->
@@ -86,8 +88,6 @@ internal class OpenAiAgentService(
                 embedding[i] += (hash shr (i % 32) and 1).toFloat() * (1f / sqrt(words.size.toFloat()))
             }
         }
-
-        // Normalize
         val magnitude = sqrt(embedding.sumOf { it.toDouble() * it.toDouble() }).toFloat()
         if (magnitude > 0) {
             embedding.indices.forEach { i ->
@@ -98,7 +98,6 @@ internal class OpenAiAgentService(
         return embedding.toList()
     }
 
-    // Get model info
     fun getModelInfo(): EmbeddingModelInfo = when (embeddingModel) {
         "text-embedding-3-small" -> EmbeddingModelInfo(
             name = "text-embedding-3-small",

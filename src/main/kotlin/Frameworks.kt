@@ -7,7 +7,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.plugins.di.*
-import io.ktor.util.logging.*
 import kotlinx.serialization.json.Json
 import pl.config.DatabaseFactory
 import pl.service.ai.*
@@ -44,7 +43,7 @@ private fun DependencyRegistry.services() = this.apply {
     provide<AiAgentService> { OpenAiAgentService(resolve(), resolve()) }
     provide<RedisService> { RedisServiceImpl(resolve()) }
     provide<EmbeddingService> { EmbeddingServiceImpl(resolve()) }
-    provide<DocumentService> { DocumentServiceImpl(resolve(), resolve()) }
+    provide<DocumentService> { DocumentServiceImpl(resolve(), resolve(), resolve()) }
     provide<RAGService> { RAGServiceImpl(resolve(), resolve()) }
 }
 
