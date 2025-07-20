@@ -1,4 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import io.ktor.plugin.features.DockerPortMapping
+import io.ktor.plugin.features.DockerPortMappingProtocol
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -63,9 +66,23 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xallow-any-scripts-in-source-roots")
-        jvmTarget = "17"
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xallow-any-scripts-in-source-roots")
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
+
+ktor {
+    docker {
+        localImageName.set("ejdev")
+        portMappings.set(listOf(
+            DockerPortMapping(
+                outsideDocker = 8080,
+                insideDocker = 8080,
+                DockerPortMappingProtocol.TCP
+            )
+        ))
+    }
+}
+

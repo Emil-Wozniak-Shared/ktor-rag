@@ -14,10 +14,10 @@ class DatabaseFactory(
     private val logger = KotlinLogging.logger {  }
     fun init() {
         val driverClassName = "org.postgresql.Driver"
-        val url = config.property("postgres.url").getString()
+        val url = config.property("database.url").getString()
         logger.info { "Connecting to postgres database at $url" }
-        val user = config.property("postgres.user").getString()
-        val password = config.property("postgres.password").getString()
+        val user = config.property("database.user").getString()
+        val password = config.property("database.password").getString()
         Database.connect(url, driverClassName, user, password)
 
         transaction {

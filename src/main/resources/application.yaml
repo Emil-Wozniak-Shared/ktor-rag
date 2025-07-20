@@ -4,18 +4,17 @@ ktor:
             - pl.ApplicationKt.module
     deployment:
         port: 8080
-# Docker image defaults included
-postgres:
-  url: "jdbc:postgresql://localhost:15432/rag_db"
-  user: postgres
-  password: postgres
+database:
+  url: $DATABASE_URL
+  user: $DATABASE_USER
+  password: $DATABASE_PASSWORD
 koog:
   api-key:
     openai:
 jedis:
-  host: "localhost"
-  port: 6379
-  password: "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81"
+  host: $JEDIS_HOST
+  port: $JEDIS_HOST
+  password: $JEDIS_PASSWORD
 xwiki:
   username: "ai"
   password: "G#m%LWz@jFAelhbW&4kCzvW63kNOsEyP"
