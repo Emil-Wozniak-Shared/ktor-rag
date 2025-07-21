@@ -7,8 +7,10 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.plugins.di.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import pl.config.DatabaseFactory
+import pl.ext.test
 import pl.service.ai.*
 import pl.service.cache.RedisService
 import pl.service.cache.RedisServiceImpl
@@ -47,13 +49,14 @@ private fun DependencyRegistry.services() = this.apply {
     provide<RAGService> { RAGServiceImpl(resolve(), resolve()) }
 }
 
-fun Application.configureFrameworks(testing: Boolean = false) {
+fun Application.configureFrameworks() {
+    val test = this.environment.config.test
     dependencies {
         system(this@configureFrameworks)
-        services()
+        if (!test) { services() }
     }
 
     val db: DatabaseFactory by dependencies
-    db.init(testing)
+    db.init()
 }
 

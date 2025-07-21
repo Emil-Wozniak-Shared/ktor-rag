@@ -1,4 +1,5 @@
 ktor:
+    environment: $PROFILE
     application:
         modules:
             - pl.ApplicationKt.module

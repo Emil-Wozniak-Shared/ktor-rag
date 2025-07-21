@@ -2,6 +2,7 @@ package pl
 
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
+import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -14,6 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.json.internal.readJson
 import pl.ext.send
 import pl.ext.toDto
 import pl.model.ai.AiFailureResponse
@@ -54,19 +56,19 @@ fun Application.configureRouting() {
                     .toDto(aiFailureMapper, askAiResponseMapper)
                     .send<AiFailureResponse, AskAiResponse>(call)
             }
-            post("/documents") {
-                call.receive<DocumentRequest>()
-                    .let { documentService.addDocument(it) }
-                    .let { call.respond(HttpStatusCode.Created, mapOf("id" to it)) }
-            }
-            post("/documents/xwiki") {
-                documentService.loadDocumentsFromXWiki()
-                call.respond(HttpStatusCode.Created, mapOf("status" to "OK"))
-            }
             get("/documents") {
                 documentService.getAllDocuments()
                     .toDto(documentsFailureResponseMapper, documentsMapper)
                     .send(call)
+            }
+            post("/documents") {
+                val documentRequest = call.receive<DocumentRequest>()
+                val id = documentService.addDocument(documentRequest)
+                call.respond(Created, mapOf("id" to id))
+            }
+            post("/documents/xwiki") {
+                documentService.loadDocumentsFromXWiki()
+                call.respond(Created, mapOf("status" to "OK"))
             }
             post("/search") {
                 val request = call.receive<SearchRequest>()

@@ -13,8 +13,8 @@ data class Document(
 
 @Serializable
 data class DocumentRequest(
-    val title: String,
-    val content: String,
+    val title: String = "",
+    val content: String = "",
     val metadata: String? = null
 )
 

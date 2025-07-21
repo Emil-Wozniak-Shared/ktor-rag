@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.ktor.plugin.features.DockerPortMapping
 import io.ktor.plugin.features.DockerPortMappingProtocol
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -8,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
     alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.kotest)
 }
 
 group = "pl"
@@ -57,11 +57,13 @@ dependencies {
 
     // Redis
     implementation("redis.clients:jedis:5.0.2")
+
     implementation("org.apache.commons:commons-math3:3.6.1")
 
     testImplementation("io.kotest.extensions:kotest-assertions-ktor:2.0.0")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
-
+    testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("io.mockk:mockk-bdd:1.14.5")
     implementation(libs.arrow.core)
     implementation(libs.arrow.fx.coroutines)
     implementation(libs.koog.agents)
