@@ -18,7 +18,7 @@ import pl.model.error.InvalidParamsProblemDetails
 import pl.model.redis.DocumentRequest
 import pl.model.redis.SearchRequest
 
-class ApplicationSpec : KtorFreeSpec({
+internal class ApplicationSpec : KtorFreeSpec({
     "GET static resource works" - {
         integrationAppSpec {
             // expect

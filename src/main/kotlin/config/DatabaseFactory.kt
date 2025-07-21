@@ -2,7 +2,6 @@ package pl.config
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.tryGetString
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -28,6 +27,7 @@ class DatabaseFactory(
     }
 }
 
+@Suppress("unused")
 object Documents : Table() {
     val id = varchar("id", 50)
     val title = varchar("title", 255)
@@ -43,5 +43,5 @@ object Embeddings : Table() {
     val embedding = text("embedding") // JSON array of floats
     val chunkIndex = integer("chunk_index")
     val chunkContent = text("chunk_content")
-    override val primaryKey = PrimaryKey(Embeddings.id, name = "PK_Embeddings_Id")
+    override val primaryKey = PrimaryKey(id, name = "PK_Embeddings_Id")
 }

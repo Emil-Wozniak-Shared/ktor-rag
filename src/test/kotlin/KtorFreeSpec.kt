@@ -13,7 +13,6 @@ import pl.service.ai.EmbeddingService
 import pl.service.ai.RAGService
 import pl.service.cache.RedisService
 import pl.service.docs.DocumentService
-import kotlin.reflect.KClass
 
 internal open class KtorFreeSpec(
     body: FreeSpec.() -> Unit = {}

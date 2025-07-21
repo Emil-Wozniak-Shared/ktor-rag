@@ -15,7 +15,6 @@ import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.internal.readJson
 import pl.ext.send
 import pl.ext.toDto
 import pl.model.ai.AiFailureResponse

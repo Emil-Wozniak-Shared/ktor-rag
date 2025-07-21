@@ -7,7 +7,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.plugins.di.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import pl.config.DatabaseFactory
 import pl.ext.test
