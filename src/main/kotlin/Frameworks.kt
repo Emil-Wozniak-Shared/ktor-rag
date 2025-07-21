@@ -29,7 +29,7 @@ private fun DependencyRegistry.system(app: Application) = this.apply {
     val config = app.environment.config
     provide<ApplicationConfig> { config }
     provide<DatabaseFactory> { DatabaseFactory(resolve()) }
-    provide<JedisPool> { jedisPool(config) }
+    provide<JedisPool> { jedisPool(resolve()) }
     provide<HttpClient> {
         HttpClient(CIO) {
             install(ContentNegotiation) {
@@ -47,13 +47,13 @@ private fun DependencyRegistry.services() = this.apply {
     provide<RAGService> { RAGServiceImpl(resolve(), resolve()) }
 }
 
-fun Application.configureFrameworks() {
+fun Application.configureFrameworks(testing: Boolean = false) {
     dependencies {
         system(this@configureFrameworks)
         services()
     }
 
     val db: DatabaseFactory by dependencies
-    db.init()
+    db.init(testing)
 }
 

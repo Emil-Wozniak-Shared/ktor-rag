@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.ktor.plugin.features.DockerPortMapping
 import io.ktor.plugin.features.DockerPortMappingProtocol
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -57,6 +58,10 @@ dependencies {
     // Redis
     implementation("redis.clients:jedis:5.0.2")
     implementation("org.apache.commons:commons-math3:3.6.1")
+
+    testImplementation("io.kotest.extensions:kotest-assertions-ktor:2.0.0")
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+
     implementation(libs.arrow.core)
     implementation(libs.arrow.fx.coroutines)
     implementation(libs.koog.agents)
@@ -64,12 +69,19 @@ dependencies {
     implementation(project(":logbackt"))
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
+    testImplementation("com.h2database:h2:2.3.232")
 }
 
-tasks.withType<KotlinJvmCompile>().configureEach {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xallow-any-scripts-in-source-roots")
-        jvmTarget.set(JvmTarget.JVM_17)
+tasks {
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.addAll("-Xjsr305=strict", "-Xallow-any-scripts-in-source-roots")
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+
+    withType<Test>().configureEach {
+        useJUnitPlatform()
     }
 }
 

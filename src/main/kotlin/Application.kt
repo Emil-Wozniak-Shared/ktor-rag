@@ -13,9 +13,11 @@ fun main(args: Array<String>) {
     EngineMain.main(args)
 }
 
-fun Application.module() {
-    configureFrameworks()
-    configureMonitoring()
+fun Application.module(testing: Boolean = false) {
+    configureFrameworks(testing)
+    if (!testing) {
+        configureMonitoring()
+    }
     configureRouting()
 }
 
