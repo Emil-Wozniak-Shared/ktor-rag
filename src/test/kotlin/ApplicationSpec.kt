@@ -2,6 +2,7 @@ package pl
 
 import arrow.core.Either
 import io.kotest.assertions.ktor.client.shouldHaveStatus
+import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
@@ -14,19 +15,20 @@ import io.mockk.bdd.coGiven
 import io.mockk.bdd.coThen
 import io.mockk.bdd.given
 import io.mockk.bdd.then
+import pl.model.ai.RAGResponse
 import pl.model.error.InvalidParamsProblemDetails
 import pl.model.redis.DocumentRequest
 import pl.model.redis.SearchRequest
 
-internal class ApplicationSpec : KtorFreeSpec({
+ class ApplicationSpec : FreeSpec({
     "GET static resource works" - {
-        integrationAppSpec {
+        unitAppSpec {
             // expect
             client.get("/") shouldHaveStatus OK
         }
     }
     "GET api documents works" - {
-        integrationAppSpec { mocks ->
+        unitAppSpec { mocks ->
             given { mocks.documentService.getAllDocuments() } returns Either.Right(listOf())
 
             client.get("/api/documents") shouldHaveStatus OK
@@ -35,7 +37,7 @@ internal class ApplicationSpec : KtorFreeSpec({
         }
     }
     "POST documents works" - {
-        integrationAppSpec { mocks ->
+        unitAppSpec { mocks ->
             val request = DocumentRequest("Tytuł testowy", "test content")
             coGiven { mocks.documentService.addDocument(request) } returns "Tytuł testowy"
 
@@ -51,7 +53,7 @@ internal class ApplicationSpec : KtorFreeSpec({
         }
     }
     "POST documents fails on short title" - {
-        integrationAppSpec { mocks ->
+        unitAppSpec { mocks ->
             // given
             val request = DocumentRequest("test", "test content")
             val uri = "/api/documents"
@@ -75,17 +77,37 @@ internal class ApplicationSpec : KtorFreeSpec({
         }
     }
     "POST search documents" - {
-        integrationAppSpec {
+        unitAppSpec { mocks ->
             // given
             val request = SearchRequest("testowana fraza", 100)
+            coGiven { mocks.documentService.searchDocuments(request.query, request.limit) } returns listOf()
 
             //when
             val response = client.post("/api/search") {
                 headers { contentType(ContentType.Application.Json) }
                 setBody(request)
             }
+
             // then
             response shouldHaveStatus OK
+            coThen { mocks.documentService.searchDocuments(request.query, request.limit) }
+        }
+    }
+    "POST rag documents" - {
+        unitAppSpec { mocks ->
+            // given
+            val request = SearchRequest("testowana fraza", 100)
+            coGiven { mocks.ragService.generateAnswer(request.query) } returns RAGResponse(request.query, "answer", listOf())
+
+            //when
+            val response = client.post("/api/rag") {
+                headers { contentType(ContentType.Application.Json) }
+                setBody(request)
+            }
+
+            // then
+            response shouldHaveStatus OK
+            coThen { mocks.ragService.generateAnswer(request.query) }
         }
     }
 })

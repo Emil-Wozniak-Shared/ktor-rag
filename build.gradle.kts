@@ -1,3 +1,4 @@
+import io.kotest.framework.gradle.tasks.KotestJvmTask
 import io.ktor.plugin.features.DockerPortMapping
 import io.ktor.plugin.features.DockerPortMappingProtocol
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -74,6 +75,11 @@ dependencies {
     testImplementation("com.h2database:h2:2.3.232")
 }
 
+val copyTestResources by tasks.registering(Copy::class) {
+    from("src/test/resources")
+    into("${buildDir}/resources/test")
+}
+
 tasks {
     withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
@@ -84,6 +90,9 @@ tasks {
 
     withType<Test>().configureEach {
         useJUnitPlatform()
+    }
+    withType<KotestJvmTask>().configureEach {
+        dependsOn(copyTestResources)
     }
 }
 
