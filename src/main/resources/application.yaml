@@ -11,10 +11,10 @@ database:
   password: $DATABASE_PASSWORD
 koog:
   api-key:
-    openai:
+    openai: $OPENAI_KEY
 jedis:
   host: $JEDIS_HOST
-  port: $JEDIS_HOST
+  port: $JEDIS_PORT
   password: $JEDIS_PASSWORD
 xwiki:
   username: "ai"

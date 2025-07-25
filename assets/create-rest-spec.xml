@@ -1,5 +1,6 @@
 <page xmlns="http://www.xwiki.org">
-    <link rel="http://www.xwiki.org/rel/space" href="http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main"/>
+    <link rel="http://www.xwiki.org/rel/space"
+          href="http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main"/>
     <version>1.1</version>
     <majorVersion>1</majorVersion>
     <minorVersion>1</minorVersion>
@@ -287,7 +288,7 @@
 
         * **PUT**
         The PUT method requests that the enclosed entity be stored under the supplied Request-URI.
-        The fundamental difference between the POST and PUT requests is reflected in the different meaning of the Request­URI.
+        The fundamental difference between the POST and PUT requests is reflected in the different meaning of the Request-URI.
         This is an unsafe operation. When repeating the request, the overall data should stay the same.
 
 
@@ -300,7 +301,7 @@
 
 
         * **HEAD**
-        The HEAD method is identical to GET except that the server MUST NOT return a message­body in the response. The meta information
+        The HEAD method is identical to GET except that the server MUST NOT return a message-body in the response. The meta information
         contained in the HTTP headers in response to a HEAD request SHOULD be identical to the information sent in response to a GET
         request. This method can be used for obtaining metainformation about the entity implied by the request without transferring the
         entity-body itself. This method is often used for testing hypertext links for validity, accessibility, and recent modification.
@@ -534,8 +535,8 @@
         For other conventions, see the [Google JSON Style Guide](https://google.github.io/styleguide/jsoncstyleguide.xml).
 
         Additions to the style guide:
-        - birth dates as YYYY­MM­DD
-        - birthdays as MM­DD
+        - birthdates as YYYY-MM-DD
+        - birthdays as MM-DD
 
     </content>
 </page>

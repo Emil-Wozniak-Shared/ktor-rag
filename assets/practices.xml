@@ -1,5 +1,6 @@
 <page xmlns="http://www.xwiki.org">
-    <link rel="http://www.xwiki.org/rel/space" href="http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main"/>
+    <link rel="http://www.xwiki.org/rel/space"
+          href="http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/Main"/>
     <version>1.1</version>
     <majorVersion>1</majorVersion>
     <minorVersion>1</minorVersion>

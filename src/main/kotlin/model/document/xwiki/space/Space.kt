@@ -1,23 +1,22 @@
 package model.document.xwiki.space
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Space(
     @SerialName("home")
-    val home: String,
+    val home: String? = null,
     @SerialName("id")
-    val id: String,
+    val id: String? = null,
     @SerialName("links")
     val links: List<Link>,
     @SerialName("name")
-    val name: String,
+    val name: String? = null,
     @SerialName("wiki")
-    val wiki: String,
+    val wiki: String? = null,
     @SerialName("xwikiAbsoluteUrl")
-    val xwikiAbsoluteUrl: String,
+    val xwikiAbsoluteUrl: String? = null,
     @SerialName("xwikiRelativeUrl")
-    val xwikiRelativeUrl: String
+    val xwikiRelativeUrl: String? = null
 )

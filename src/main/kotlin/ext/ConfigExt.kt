@@ -8,3 +8,6 @@ private const val TEST = "TEST"
 
 val ApplicationConfig.test: Boolean
     get() = this.tryGetString(ENVIRONMENT) == TEST
+
+val ApplicationConfig.notTest: Boolean
+    get() = this.tryGetString(ENVIRONMENT) != TEST

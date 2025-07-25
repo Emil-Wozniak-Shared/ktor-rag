@@ -3,6 +3,16 @@ This project shows how to use AI RAG in your work environment.
 
 - this example includes XWiki (Confluence like app) to obtain your work documentations.
 
+
+```bash
+curl -u Admin:admin1234 -X PUT --data-binary "@assets/practices.xml" -H "Content-Type: application/xml" http://localhost:9090/rest/wikis/xwiki/spaces/Main/pages/Practices
+```
+```bash
+curl -u Admin:admin1234 -X PUT --data-binary "@assets/create-rest-spec.xml" -H "Content-Type: application/xml" http://localhost:9090/rest/wikis/xwiki/spaces/Main/pages/rest-spec
+```
+```bash
+curl -u Admin:admin1234 -X PUT --data-binary "@assets/create-business-spec.xml" -H "Content-Type: application/xml" http://localhost:9090/rest/wikis/xwiki/spaces/Main/pages/business-spec
+```
 ## Building & Running
 
 Fill [application.yaml](src/main/resources/application.yaml)
@@ -69,7 +79,9 @@ curl http://localhost:8080/api/documents | jq
 curl -X POST http://localhost:8080/api/rag \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "What is the best practices to create good architecture?",
+    "query": "How to manage communication between frontend and backend",
     "limit": 10
   }' | jq
 ```
+
+

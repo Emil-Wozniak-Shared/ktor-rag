@@ -12,7 +12,10 @@ import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import model.document.xwiki.space.XWikiSpace
 import model.document.xwiki.webpage.XWikiWebPage
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.config.Documents
 import pl.config.Embeddings
@@ -21,9 +24,10 @@ import pl.model.redis.CannotFindDocuments
 import pl.model.redis.Document
 import pl.model.redis.DocumentRequest
 import pl.model.redis.SearchResult
+import pl.repo.DocumentsRepo
+import pl.repo.EmbeddingsRepo
 import pl.service.ai.EmbeddingService
 import pl.service.cache.RedisService
-import java.util.*
 
 private val regex = "[.!?]+".toRegex()
 
@@ -57,7 +61,9 @@ interface DocumentService {
 class DocumentServiceImpl(
     private val embeddingService: EmbeddingService,
     private val redisService: RedisService,
-    private val client: HttpClient
+    private val client: HttpClient,
+    private val documentsRepo: DocumentsRepo,
+    private val embeddingsRepo: EmbeddingsRepo
 ) : DocumentService {
     private val json = Json { ignoreUnknownKeys = true }
     private val logger = KotlinLogging.logger {}
@@ -71,14 +77,10 @@ class DocumentServiceImpl(
             }
             .body<XWikiSpace>()
             .spaces
-            .map { space -> space.links.first { it.href.endsWith("WebHome") }.href }
-            .map { href ->
-                client.get(href) {
-                    headers {
-                        accept(ContentType.Application.Json)
-                    }
-                }.body<XWikiWebPage>()
-            }
+            .filter { it.links.any { it.href.endsWith("WebHome") } }
+            .map { space -> space.links.first { it.href.endsWith("WebHome") } }
+            .map { it.href }
+            .map { href -> client.get(href) { headers { accept(ContentType.Application.Json) } }.body<XWikiWebPage>() }
             .map {
                 DocumentRequest(
                     it.title,
@@ -91,28 +93,10 @@ class DocumentServiceImpl(
 
     override suspend fun addDocument(request: DocumentRequest): String {
         logger.info { "Add document: $request" }
-        val documentId = UUID.randomUUID().toString()
-        transaction {
-            Documents.insert {
-                it[id] = documentId
-                it[title] = request.title
-                it[content] = request.content
-                it[metadata] = request.metadata
-            }
-        }
+        val documentId = documentsRepo.add(DocumentRequest(request.title, request.content, request.metadata))
         chunkText(request.content).forEachIndexed { index, chunk ->
-            val embedding = embeddingService.generateEmbedding(chunk).getOrElse {
-                error(it.message)
-            }
-            transaction {
-                Embeddings.insert {
-                    it[id] = UUID.randomUUID().toString()
-                    it[this.documentId] = documentId
-                    it[this.embedding] = json.encodeToString(embedding)
-                    it[chunkIndex] = index
-                    it[chunkContent] = chunk
-                }
-            }
+            val embedding = embeddingService.generateEmbedding(chunk).getOrElse { error(it.message) }
+            embeddingsRepo.create(documentId, index, chunk, json.encodeToString(embedding))
         }
 
         return documentId
@@ -160,7 +144,10 @@ class DocumentServiceImpl(
         return results
     }
 
-    private fun getSimilarities(embeddings: List<EmbeddingWrapper>, queryEmbedding: List<Float>): List<Triple<String, Int, Double>> = embeddings
+    private fun getSimilarities(
+        embeddings: List<EmbeddingWrapper>,
+        queryEmbedding: List<Float>
+    ): List<Triple<String, Int, Double>> = embeddings
         .map { (docId, chunkIdx, embedding) ->
             Triple(
                 docId,

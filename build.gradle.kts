@@ -1,4 +1,3 @@
-import io.kotest.framework.gradle.tasks.KotestJvmTask
 import io.ktor.plugin.features.DockerPortMapping
 import io.ktor.plugin.features.DockerPortMappingProtocol
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -43,8 +42,6 @@ dependencies {
     implementation(libs.ktor.line.webhook.plugin)
     implementation(libs.ktor.server.cio)
 
-    implementation("org.codehaus.groovy:groovy-all:3.0.13")
-    implementation("org.slf4j:slf4j-api:2.0.17")
 
     implementation(libs.logback.classic)
     implementation(libs.logback.core)
@@ -61,9 +58,13 @@ dependencies {
 
     implementation("org.apache.commons:commons-math3:3.6.1")
 
-    testImplementation("io.kotest.extensions:kotest-assertions-ktor:2.0.0")
+    // Use Groovy 4.x for both implementation and test
+    implementation("org.apache.groovy:groovy-all:4.0.27")
+    implementation("org.slf4j:slf4j-api:2.0.17")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("io.kotest.extensions:kotest-assertions-ktor:2.0.0")
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.mockk:mockk-bdd:1.14.5")
     implementation(libs.arrow.core)
     implementation(libs.arrow.fx.coroutines)
@@ -87,11 +88,10 @@ tasks {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
-
     withType<Test>().configureEach {
-        useJUnitPlatform()
+        dependsOn(copyTestResources)
     }
-    withType<KotestJvmTask>().configureEach {
+    withType<io.kotest.framework.gradle.tasks.KotestJvmTask>().configureEach {
         dependsOn(copyTestResources)
     }
 }
