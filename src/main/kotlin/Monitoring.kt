@@ -24,7 +24,7 @@ fun Application.configureMonitoring() {
             verboseHealthCheckResponse = true
             healthcheck("/health", HealthCheckRegistry(Dispatchers.Default) {
                 register(FreememHealthCheck.mb(250), 10.seconds, 10.seconds)
-                register(ProcessCpuHealthCheck(0.8), 10.seconds, 10.seconds)
+//                register(ProcessCpuHealthCheck(0.8), 10.seconds, 10.seconds)
             })
         }
     }

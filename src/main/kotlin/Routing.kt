@@ -1,5 +1,6 @@
 package pl
 
+import FileProcessor
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Created
@@ -46,6 +47,7 @@ fun Application.configureRouting() {
     val openAiAgentService: AiAgentService by dependencies
     val documentService: DocumentService by dependencies
     val ragService: RAGService by dependencies
+    val fileProcessor: FileProcessor by dependencies
 
     routing {
         staticResources("/", "static")
@@ -77,6 +79,10 @@ fun Application.configureRouting() {
                 call.receive<SearchRequest>()
                     .let { (query, _) -> ragService.generateAnswer(query) }
                     .let { call.respond(it) }
+            }
+            post("/file") {
+                fileProcessor.run()
+                call.respond(mapOf("status" to "success"))
             }
         }
     }

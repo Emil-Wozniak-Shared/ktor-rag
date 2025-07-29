@@ -1,6 +1,5 @@
 package service.docs;
 
-import arrow.core.Either
 import arrow.core.right
 import io.kotest.common.runBlocking
 import io.kotest.matchers.equals.shouldNotBeEqual

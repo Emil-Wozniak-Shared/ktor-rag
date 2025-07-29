@@ -1,5 +1,8 @@
 package pl.service.ai
 
+import OpenAIMessage
+import OpenAIRequest
+import OpenAIResponse
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
@@ -10,6 +13,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.server.config.ApplicationConfig
 import kotlinx.serialization.Serializable
@@ -22,6 +26,13 @@ import kotlin.math.sqrt
 interface AiAgentService {
     suspend fun ask(input: String): Either<AiFailure, String>
     suspend fun embeddings(text: String): Either<AiFailure, List<Float>>
+    suspend fun processText(
+        prompt: String,
+        systemMessage: String?,
+        model: String,
+        maxTokens: Int?,
+        temperature: Double?
+    ): Result<String>
 }
 
 private val WORD_REGEX = "\\W+".toRegex()
@@ -121,6 +132,51 @@ internal class OpenAiAgentService(
         )
 
         else -> EmbeddingModelInfo(embeddingModel, 1536, 8192, 0.0)
+    }
+
+    suspend fun chatCompletion(
+        messages: List<OpenAIMessage>, model: String = "gpt-4", maxTokens: Int? = null, temperature: Double? = null
+    ): Result<OpenAIResponse> {
+        return try {
+            val request = OpenAIRequest(
+                model = model, messages = messages, max_tokens = maxTokens, temperature = temperature
+            )
+
+            val response = client.post("https://api.openai.com/v1/chat/completions") {
+                header(HttpHeaders.Authorization, "Bearer $apiToken")
+                header(HttpHeaders.ContentType, "application/json")
+                setBody(request)
+            }
+
+            if (response.status.isSuccess()) {
+                val openAIResponse = response.body<OpenAIResponse>()
+                Result.success(openAIResponse)
+            } else {
+                val errorBody = response.bodyAsText()
+                Result.failure(Exception("OpenAI API error: ${response.status} - $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun processText(
+        prompt: String,
+        systemMessage: String?,
+        model: String,
+        maxTokens: Int?,
+        temperature: Double?
+    ): Result<String> {
+        val messages = mutableListOf<OpenAIMessage>()
+
+        systemMessage?.let {
+            messages.add(OpenAIMessage("system", it))
+        }
+        messages.add(OpenAIMessage("user", prompt))
+
+        return chatCompletion(messages, model, maxTokens, temperature).map { response ->
+            response.choices.firstOrNull()?.message?.content ?: throw Exception("No response content from OpenAI")
+        }
     }
 }
 

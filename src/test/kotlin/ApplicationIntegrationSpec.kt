@@ -8,6 +8,9 @@ import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.OK
+import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.coVerifyAll
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.verifyAll
@@ -75,8 +78,8 @@ class ApplicationIntegrationSpec : IntegrationSpec {
     fun `POST search documents`() = appSpec {
         // given
         val request = SearchRequest(QUERY, 100)
-        every { redisService.getCachedSearchResults(any()) } returns listOf()
-        justRun { redisService.cacheSearchResults(any(), any()) }
+        coEvery { redisService.getCachedSearchResults(any()) } returns listOf()
+        coJustRun { redisService.cacheSearchResults(any(), any()) }
 
         //when
         val response = client.post("/api/search") {
@@ -86,7 +89,7 @@ class ApplicationIntegrationSpec : IntegrationSpec {
 
         // then
         response shouldHaveStatus OK
-        verifyAll {
+        coVerifyAll {
             redisService.getCachedSearchResults(any())
             redisService.cacheSearchResults(any(), any())
         }
@@ -96,8 +99,8 @@ class ApplicationIntegrationSpec : IntegrationSpec {
     fun `POST rag documents`() = appSpec {
         // given
         val request = SearchRequest(QUERY, 100)
-        every { redisService.getCachedSearchResults(any()) } returns listOf()
-        justRun { redisService.cacheSearchResults(any(), any()) }
+        coEvery { redisService.getCachedSearchResults(any()) } returns listOf()
+        coJustRun { redisService.cacheSearchResults(any(), any()) }
 
         //when
         val response = client.post("/api/rag") {
@@ -107,7 +110,7 @@ class ApplicationIntegrationSpec : IntegrationSpec {
 
         // then
         response shouldHaveStatus OK
-        verifyAll {
+        coVerifyAll {
             redisService.getCachedSearchResults(any())
             redisService.cacheSearchResults(any(), any())
         }

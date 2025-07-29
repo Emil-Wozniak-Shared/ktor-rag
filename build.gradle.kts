@@ -54,9 +54,11 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:0.44.1")
 
     // Redis
-    implementation("redis.clients:jedis:5.0.2")
+//    implementation("redis.clients:jedis:5.0.2")
+    implementation("io.github.domgew:kedis-jvm:0.0.9")
 
     implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("com.itextpdf:itext7-core:7.2.5")
 
     // Use Groovy 4.x for both implementation and test
     implementation("org.apache.groovy:groovy-all:4.0.27")

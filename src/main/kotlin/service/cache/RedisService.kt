@@ -1,45 +1,56 @@
 package pl.service.cache
 
+import io.github.domgew.kedis.KedisClient
+import io.github.domgew.kedis.arguments.value.SetOptions
+import io.github.domgew.kedis.commands.KedisValueCommands
 import kotlinx.serialization.json.Json
 import pl.model.redis.SearchResult
-import redis.clients.jedis.Jedis
-import redis.clients.jedis.JedisPool
 import kotlin.time.Duration.Companion.hours
 
 interface RedisService {
-    fun cacheSearchResults(query: String, results: List<SearchResult>)
-    fun getCachedSearchResults(query: String): List<SearchResult>
-    fun cacheEmbedding(text: String, embedding: List<Float>)
-    fun getCachedEmbedding(text: String): List<Float>
+    suspend fun cacheSearchResults(query: String, results: List<SearchResult>)
+    suspend fun getCachedSearchResults(query: String): List<SearchResult>
+    suspend fun cacheEmbedding(text: String, embedding: List<Float>)
+    suspend fun getCachedEmbedding(text: String): List<Float>
 }
 
 class RedisServiceImpl(
-    private val pool: JedisPool,
+    private val kedisClient: KedisClient,
 ) : RedisService {
     private val json = Json { ignoreUnknownKeys = true }
 
-    override fun cacheSearchResults(query: String, results: List<SearchResult>): Unit = pool.resource.use { jedis ->
+    override suspend fun cacheSearchResults(query: String, results: List<SearchResult>): Unit = kedisClient.use { jedis ->
         jedis.expire(Key(query), 1, results)
     }
 
-    override fun getCachedSearchResults(query: String): List<SearchResult> = pool.resource.use { jedis ->
-        jedis.get("search:${query.hashCode()}")
+    override suspend fun getCachedSearchResults(query: String): List<SearchResult> = kedisClient.use { client ->
+        client.execute(KedisValueCommands.get( "search:${query.hashCode()}"))
             ?.let { json.decodeFromString<List<SearchResult>>(it) }
             .orEmpty()
     }
 
-    override fun cacheEmbedding(text: String, embedding: List<Float>): Unit = pool.resource.use { jedis ->
-        jedis.expire(Key(text), hours = 24, embedding)
+    override suspend fun cacheEmbedding(text: String, embedding: List<Float>): Unit = kedisClient.use { client ->
+        client.expire(Key(text), hours = 24, embedding)
     }
 
-    override fun getCachedEmbedding(text: String): List<Float> = pool.resource.use { jedis ->
-        jedis.get(Key(text).hash())
+    override suspend fun getCachedEmbedding(text: String): List<Float> = kedisClient.use { client ->
+        client.execute(KedisValueCommands.get(Key(text).hash()))
             ?.let { json.decodeFromString<List<Float>>(it) }
             .orEmpty()
     }
 
-    private inline fun <reified T> Jedis.expire(key: Key, hours: Int, embedding: List<T>) {
-        this.setex(key.hash(), hours.hours.inWholeSeconds, embedding.toJson<T>())
+    private suspend inline fun <reified T> KedisClient.expire(key: Key, hours: Int, embedding: List<T>) {
+        this.execute(
+            KedisValueCommands.set(
+                key = key.hash(),
+                value = embedding.toJson(),
+                options = SetOptions(
+                    expire = SetOptions.ExpireOption.ExpiresAtUnixEpochMillisecond(
+                        hours.hours.inWholeSeconds
+                    )
+                )
+            ),
+        )
     }
 
     private inline fun <reified T> List<T>.toJson(): String = json.encodeToString(this)
