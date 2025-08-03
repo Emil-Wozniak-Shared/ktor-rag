@@ -38,37 +38,6 @@ services:
       - xwiki-data:/usr/local/xwiki
     networks:
       - bridge
-#  bookstack:
-#    image: lscr.io/linuxserver/bookstack:latest
-#    container_name: bookstack
-#    environment:
-#      - PUID=1000
-#      - PGID=1000
-#      - TZ=Etc/UTC
-#      - APP_URL=
-#      - APP_KEY=base64:7EWpwMSd0DH5IAuRYBoAZcYUFGhGyTf5SdRo+8ZOgy8=
-#      - DB_HOST=db
-#      - DB_PORT=3306
-#      - DB_USERNAME=bookstack-dev
-#      - DB_PASSWORD=bookstack-dev
-#      - DB_DATABASE=bookstack-dev
-#    volumes:
-#      - /path/to/bookstack/config:/config
-#    ports:
-#      - "6875:80"
-#    restart: unless-stopped
-#    depends_on:
-#      - mysql
-#  mysql:
-#    image: mysql:8.4
-#    environment:
-#      MYSQL_DATABASE: bookstack-dev
-#      MYSQL_USER: bookstack-test
-#      MYSQL_PASSWORD: bookstack-test
-#      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
-#    volumes:
-#      - ./dev/docker/init.db:/docker-entrypoint-initdb.d
-#      - db:/var/lib/mysql
 volumes:
   xwiki-data: {}
   db:

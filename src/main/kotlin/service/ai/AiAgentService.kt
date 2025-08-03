@@ -1,8 +1,5 @@
 package pl.service.ai
 
-import OpenAIMessage
-import OpenAIRequest
-import OpenAIResponse
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
@@ -135,10 +132,10 @@ internal class OpenAiAgentService(
     }
 
     suspend fun chatCompletion(
-        messages: List<OpenAIMessage>, model: String = "gpt-4", maxTokens: Int? = null, temperature: Double? = null
-    ): Result<OpenAIResponse> {
+        messages: List<pl.model.ai.OpenAIMessage>, model: String = "gpt-4", maxTokens: Int? = null, temperature: Double? = null
+    ): Result<pl.model.ai.OpenAIResponse> {
         return try {
-            val request = OpenAIRequest(
+            val request = _root_ide_package_.pl.model.ai.OpenAIRequest(
                 model = model, messages = messages, max_tokens = maxTokens, temperature = temperature
             )
 
@@ -149,7 +146,7 @@ internal class OpenAiAgentService(
             }
 
             if (response.status.isSuccess()) {
-                val openAIResponse = response.body<OpenAIResponse>()
+                val openAIResponse = response.body<pl.model.ai.OpenAIResponse>()
                 Result.success(openAIResponse)
             } else {
                 val errorBody = response.bodyAsText()
@@ -167,12 +164,12 @@ internal class OpenAiAgentService(
         maxTokens: Int?,
         temperature: Double?
     ): Result<String> {
-        val messages = mutableListOf<OpenAIMessage>()
+        val messages = mutableListOf<pl.model.ai.OpenAIMessage>()
 
         systemMessage?.let {
-            messages.add(OpenAIMessage("system", it))
+            messages.add(_root_ide_package_.pl.model.ai.OpenAIMessage("system", it))
         }
-        messages.add(OpenAIMessage("user", prompt))
+        messages.add(_root_ide_package_.pl.model.ai.OpenAIMessage("user", prompt))
 
         return chatCompletion(messages, model, maxTokens, temperature).map { response ->
             response.choices.firstOrNull()?.message?.content ?: throw Exception("No response content from OpenAI")
@@ -192,7 +189,7 @@ data class OpenAIEmbeddingResponse(
     val `object`: String,
     val data: List<OpenAIEmbeddingData>,
     val model: String,
-    val usage: OpenAIUsage
+    val usage: pl.model.ai.OpenAIUsage
 )
 
 @Serializable
